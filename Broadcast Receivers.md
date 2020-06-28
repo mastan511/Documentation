@@ -260,5 +260,12 @@ case ACTION_CUSTOM_BROADCAST:
    break;
 ```
 2. Run your app and tap the Send Custom Broadcast button to send a custom broadcast. Your receiver (CustomReceiver) displays a toast message.
+
+## Note:
+To Import **LocalBroadcastManager** class we need to add one dependency in the app level gradle file
+```gradle
+implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+```
+
 ### OutPut
 <img src="https://github.com/mastan511/MastanImages/blob/master/ezgif.com-video-to-gif%20(1).gif" height=400 width=200>
