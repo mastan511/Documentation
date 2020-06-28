@@ -152,3 +152,33 @@ this.registerReceiver(mReceiver, filter);
        super.onDestroy();
    }
 ```
+#### Implement onReceive() in your BroadcastReceiver
+When a broadcast receiver intercepts a broadcast that it's registered for, the Intent is delivered to the receiver's onReceive() method.
+
+In CustomReceiver.java, inside the onReceive() method, implement the following steps:
+- Delete the entire onReceive() method implementation, including the UnsupportedOperationException code.
+- Get the Intent action from the intent parameter and store it in a String variable called intentAction.
+```java
+@Override
+public void onReceive(Context context, Intent intent) {
+   String intentAction = intent.getAction();
+}
+```
+3. Create a switch statement with the intentAction string. (Before using intentAction, do a null check on it.) Display a different toast message for each action your receiver is registered for.
+```java
+if (intentAction != null) {
+   String toastMessage = "unknown intent action";
+   switch (intentAction){
+       case Intent.ACTION_POWER_CONNECTED:
+           toastMessage = "Power connected!";
+           break;
+       case Intent.ACTION_POWER_DISCONNECTED:
+           toastMessage = "Power disconnected!";
+           break;
+   }
+
+  //Display the toast.
+  Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show();
+}
+```
+4. Run your app. After the app is running, connect or disconnect your device's power supply. A Toast is displayed each time you connect or disconnect the power supply, as long as your Activity is running.
