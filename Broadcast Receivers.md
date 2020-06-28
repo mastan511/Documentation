@@ -137,3 +137,18 @@ filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
 filter.addAction(Intent.ACTION_POWER_CONNECTED);
 ```
 
+#### Register and unregister the receiver
+1. In MainActivity.java, at the end of onCreate(), register your receiver using the MainActivity context. Your receiver is active and able to receive broadcasts as long as your MainActivity is running.
+```java
+// Register the receiver using the activity context.
+this.registerReceiver(mReceiver, filter);
+```
+2. In MainActivity.java, override the onDestroy() method and unregister your receiver. To save system resources and avoid leaks, dynamic receivers must be unregistered when they are no longer needed or before the corresponding activity or app is destroyed, depending on the context used.
+```java
+@Override
+   protected void onDestroy() {
+       //Unregister the receiver
+       this.unregisterReceiver(mReceiver);
+       super.onDestroy();
+   }
+```
