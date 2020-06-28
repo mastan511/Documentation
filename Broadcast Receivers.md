@@ -93,5 +93,47 @@ The PowerReceiver app will register a BroadcastReceiver that displays a toast me
 <img src="https://codelabs.developers.google.com/codelabs/android-training-broadcast-receivers/img/26c4a5117e27b023.png" height=400 width=200>
 
 
+### Task 1. Set up the PowerReceiver project
+#### 1.1 Create the project
+1. In Android Studio, create a new Java project called PowerReceiver. Accept the default options and use the Empty Activity template.
+2. To create a new broadcast receiver, select the package name in the Android Project View and navigate to File > New > Other > Broadcast Receiver.
+3. Name the class CustomReceiver. Make sure that Java is selected as the source language, and that Exported and Enabled are selected. Exported allows your broadcast receiver to receive broadcasts from outside your app. Enabled allows the system to instantiate the receiver.
 
+### Register your receiver for system broadcasts
+A system broadcast is a message that the Android system sends when a system event occurs. Each system broadcast is wrapped in an Intent object:
+
+- The intent's action field contains event details such as **android.intent.action.HEADSET_PLUG**, which is sent when a wired headset is connected or disconnected.
+- The intent can contain other data about the event in its extra field, for example a boolean extra indicating whether a headset is connected or disconnected.
+
+Apps can register to receive specific broadcasts. When the system sends a broadcast, it routes the broadcast to apps that have registered to receive that particular type of broadcast.
+
+A **BroadcastReceiver** is either a static receiver or a dynamic receiver, depending on how you register it:
+
+- To register a receiver statically, use the <receiver> element in your **AndroidManifest.xml** file. Static receivers are also called manifest-declared receivers.
+- To register a receiver dynamically, use the app context or activity context. The receiver receives broadcasts as long as the registering context is valid, meaning as long as the corresponding app or activity is running. Dynamic receivers are also called context-registered receivers.
+   
+For this app, you're interested in two system broadcasts, **ACTION_POWER_CONNECTED** and **ACTION_POWER_DISCONNECTED**. The Android system sends these broadcasts when the device's power is connected or disconnected.
+
+Starting from Android 8.0 (API level 26 and higher), you can't use static receivers to receive most Android system broadcasts, with some exceptions. So for this task, you use dynamic receivers:
+
+1. (Optional) Navigate to your AndroidManifest.xml file. Android Studio has generated a <receiver> element, but you don't need it, because you can't use a static receiver to listen for power-connection system broadcasts. Delete the entire <receiver> element.
+2. In MainActivity.java, create a CustomReceiver object as a member variable and initialize it.
+   
+```java
+private CustomReceiver mReceiver = new CustomReceiver();
+```
+
+#### Create an intent filter with Intent actions
+Intent filters specify the types of intents a component can receive. They are used in filtering out the intents based on Intent values like action and category.
+1. In MainActivity.java, at the end of the onCreate() method, create an IntentFilter object.
+```java
+IntentFilter filter = new IntentFilter();
+```
+When the system receives an Intent as a broadcast, it searches the broadcast receivers based on the action value specified in the IntentFilter object.
+2. In MainActivity.java, at the end of onCreate(), add the actions **ACTION_POWER_CONNECTED** and **ACTION_POWER_DISCONNECTED** to the IntentFilter object.
+
+```java
+filter.addAction(Intent.ACTION_POWER_DISCONNECTED);
+filter.addAction(Intent.ACTION_POWER_CONNECTED);
+```
 
