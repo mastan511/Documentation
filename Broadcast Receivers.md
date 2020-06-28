@@ -89,4 +89,9 @@ To send a local broadcast:
 ### App overview
 The PowerReceiver app will register a BroadcastReceiver that displays a toast message when the device is connected or disconnected from power. The app will also send and receive a custom broadcast to display a different toast message.
 
-![First](https://drive.google.com/file/d/1qOcDuCqWbgnYYQoHNhEVaWHBm8kszct1/view?usp=sharing)
+
+<img src="https://codelabs.developers.google.com/codelabs/android-training-broadcast-receivers/img/26c4a5117e27b023.png" height=400 width=200>
+
+
+
+
