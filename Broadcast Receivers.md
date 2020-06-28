@@ -182,3 +182,6 @@ if (intentAction != null) {
 }
 ```
 4. Run your app. After the app is running, connect or disconnect your device's power supply. A Toast is displayed each time you connect or disconnect the power supply, as long as your Activity is running.
+
+### Output
+<img src="https://github.com/mastan511/MastanImages/blob/master/ezgif.com-video-to-gif.gif" height=400 width=200>
