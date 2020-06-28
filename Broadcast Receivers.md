@@ -185,3 +185,80 @@ if (intentAction != null) {
 
 ### Output
 <img src="https://github.com/mastan511/MastanImages/blob/master/ezgif.com-video-to-gif.gif" height=400 width=200>
+
+### Task 2. Send and receive a custom broadcast
+In addition to responding to system broadcasts, your app can send and receive custom broadcasts. Use a custom broadcast when you want your app to take an action without launching an activity, for example when you want to let other apps know that data has been downloaded to the device.
+
+#### Define your custom broadcast action string
+Both the sender and receiver of a custom broadcast must agree on a unique action string for the Intent being broadcast. It's a common practice to create a unique action string by prepending your action name with your app's package name.
+
+One of the simplest ways to get your app's package name is to use **BuildConfig.APPLICATION_ID**, which returns the applicationId property's value from your module-level build.gradle file.
+
+1. Create a constant member variable in both your MainActivity and your CustomReceiver class. You'll use this variable as the broadcast Intent action.
+```java
+private static final String ACTION_CUSTOM_BROADCAST = 
+BuildConfig.APPLICATION_ID + ".ACTION_CUSTOM_BROADCAST";
+```
+#### Add a "Send Custom Broadcast" button
+1. In your activity_main.xml layout file, replace the Hello World Textview with a Button that has the following attributes:
+
+```xml
+<Button
+   android:id = "@+id/sendBroadcast"
+   android:layout_width="wrap_content"
+   android:layout_height="wrap_content"
+   android:text="Send Custom Broadcast"
+   android:onClick="sendCustomBroadcast"
+   app:layout_constraintBottom_toBottomOf="parent"
+   app:layout_constraintLeft_toLeftOf="parent"
+   app:layout_constraintRight_toRightOf="parent"
+   app:layout_constraintTop_toTopOf="parent" />
+```
+2. Extract the string resource.
+The sendCustomBroadcast() method will be the click-event handler for the button. To create a stub for sendCustomBroadcast() in Android Studio:
+
+- Click the yellow highlighted sendCustomBroadcast method name. A red light bulb appears on the left.
+- Click the red light bulb and select Create **'sendCustomBroadcast(View)' in 'MainActivity'.**
+
+#### Implement sendCustomBroadcast()
+
+Because this broadcast is meant to be used solely by your app, use LocalBroadcastManager to manage the broadcast. LocalBroadcastManager is a class that allows you to register for and send broadcasts that are of interest to components within your app.
+
+By keeping broadcasts local, you ensure that your app data isn't shared with other Android apps. Local broadcasts keep your information more secure and maintain system efficiency.
+
+In MainActivity.java, inside the sendCustomBroadcast() method, implement the following steps:
+
+1. Create a new Intent, with your custom action string as the argument.
+```java
+Intent customBroadcastIntent = new Intent(ACTION_CUSTOM_BROADCAST);
+```
+2. After the custom Intent declaration, send the broadcast using the LocalBroadcastManager class:
+```java
+LocalBroadcastManager.getInstance(this).sendBroadcast(customBroadcastIntent);
+```
+
+#### Register and unregister your custom broadcast
+Registering for a local broadcast is similar to registering for a system broadcast, which you do using a dynamic receiver. For broadcasts sent using LocalBroadcastManager, static registration in the manifest is not allowed.
+
+If you register a broadcast receiver dynamically, you must unregister the receiver when it is no longer needed. In your app, the receiver only needs to respond to the custom broadcast when the app is running, so you can register the action in onCreate() and unregister it in onDestroy().
+1. In MainActivity.java, inside onCreate() method, get an instance of LocalBroadcastManager and register your receiver with the custom Intent action:
+```java
+LocalBroadcastManager.getInstance(this)
+             .registerReceiver(mReceiver,
+                          new IntentFilter(ACTION_CUSTOM_BROADCAST));
+```
+2. In MainActivity.java, inside the onDestroy() method, unregister your receiver from the LocalBroadcastManager:
+```java
+LocalBroadcastManager.getInstance(this)
+          .unregisterReceiver(mReceiver);
+```
+#### Respond to the custom broadcast
+1. In CustomReceiver.java, inside the onReceive() method, add another case statement in the switch block for the custom Intent action. Use "Custom Broadcast Received" as the text for the toast message.
+```java
+case ACTION_CUSTOM_BROADCAST:
+   toastMessage = "Custom Broadcast Received";
+   break;
+```
+2. Run your app and tap the Send Custom Broadcast button to send a custom broadcast. Your receiver (CustomReceiver) displays a toast message.
+### OutPut
+<img src="https://github.com/mastan511/MastanImages/blob/master/ezgif.com-video-to-gif%20(1).gif" height=400 width=200>
