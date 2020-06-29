@@ -21,10 +21,90 @@ If you want to work with shared prefrences first we should have to create the ob
 There are Two ways to get the **SharedPrefrence** class Object:
 ```java
 //It is used to store the multiple Activitys data into a Shared Prefrence
-SharedPrefrence shpf = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+SharedPrefrence mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
 (OR)
 //It is used to store single Activity Data into a Shared Prefrence
-SharedPrefrence shpf = getPreference(MODE_PRIVATE);
+SharedPrefrence mPreferences = getPreference(MODE_PRIVATE);
 ```
 ### Code lab for SharedPrefrence
-1. First create a one new AndroidStudio
+1. First create a one new AndroidStudio project(Select the Empty Activity) with the name of **SharedPreferenceTest**
+### XML Code
+```xml
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+   <EditText
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:hint="Enter username"
+       android:id="@+id/username"
+       />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter password"
+        android:id="@+id/password"
+        android:inputType="textPassword"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:onClick="login"
+        />
+
+
+</LinearLayout>
+```
+- Now I want to write the data into a shared prefrences, for that there is class called **SharedPrefrences.Editor**.
+- lets create a object for **SharedPrefrences.Editor** class Object.
+- After creating the **Sharedprences.Editor** class object, In this class so many methods are available suppose if you want to store the String value there is a method called
+**putString()** same like that **putInt()**,**putFloat()**,**putBoolean()** etc....
+- In the last we should commit the values for that we can use two methods 
+      - editor.apply()
+      - editor.commit()
+
+```java
+ @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString("uname",et_u.getText().toString());
+        editor.putString("pass",et_p.getText().toString());
+        editor.apply();
+    }
+```
+- In the oncreate method we can retrive the values and set it to the respective Edittext's.
+- If you want to retrive the data from the shared prefrences, through the **SharedPrefrences** class object we can access it.
+
+
+               - If you want to access the string values there is a method called getString()
+               - If you want to access the int values there is a method called getInt()
+```java
+ EditText et_u,et_p;
+ SharedPreferences preferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        et_u = findViewById(R.id.username);
+        et_p = findViewById(R.id.password);
+        preferences = getSharedPreferences("MASTAN",MODE_PRIVATE);
+        if(preferences!=null){
+            String name=preferences.getString("uname","Data not found");
+            String pass=preferences.getString("pass","Data not found");
+            et_u.setText(name);
+            et_p.setText(pass);
+        }else{
+            Toast.makeText(this,
+                    "In Prefrence there is no data", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+```
