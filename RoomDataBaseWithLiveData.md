@@ -506,6 +506,293 @@ Use lifecycle-aware components to enable live updating (streaming) of network da
 
 Use lifecycle-aware components to pause animated drawables while the app is in the background, then resume drawables after the app returns to the foreground.
 
+### Practical Example:
+
+#### activity_main.xml
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".MainActivity">
+    
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_person_add_black_24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/recycler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.954"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.96" />
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+#### MainActivity.java
+
+```java
+public class MainActivity extends AppCompatActivity {
+
+    FloatingActionButton fab;
+    RecyclerView rv;
+    static StudentViewModel viewModel;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        fab=findViewById(R.id.fab);
+        rv =findViewById(R.id.recycler);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this,InsertActivity.class);
+                startActivity(i);
+            }
+        });
+
+        viewModel = ViewModelProviders.of(MainActivity.this)
+                .get(StudentViewModel.class);
+
+        viewModel.readData().observe(MainActivity.this, new Observer<List<Student>>() {
+            @Override
+            public void onChanged(List<Student> students) {
+                rv.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                rv.setAdapter(new MyDataAdapter(MainActivity.this,students));
+            }
+        });
+    }
+}
+```
+#### activity_insert.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context=".InsertActivity">
+
+    <EditText
+        android:id="@+id/studentname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Student Name"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/studentrollnumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter RollNumber"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/studentmailid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Mail ID"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/studentmobileNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Mobile Number"
+        android:inputType="phone" />
+
+    <Button
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="save"
+        android:text="Save" />
+</LinearLayout>
+```
+
+#### InsertActivity.java
+
+```java
+public class InsertActivity extends AppCompatActivity {
+
+    EditText sname, sroll, smobile, smail;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_insert);
+
+        sname = findViewById(R.id.studentname);
+        sroll = findViewById(R.id.studentrollnumber);
+        smail = findViewById(R.id.studentmailid);
+        smobile = findViewById(R.id.studentmobileNumber);
+    }
+    public void save(View view) {
+        String name = sname.getText().toString();
+        String mailid = smail.getText().toString();
+        String phone = smobile.getText().toString();
+        String roll = sroll.getText().toString();
+
+        Student student = new Student();
+        student.setName(name);
+        student.setMailID(mailid);
+        student.setMobileNUmber(phone);
+        student.setRollNumber(roll);
+
+        MainActivity.viewModel.insert(student);
+
+        finish();
+    }
+}
+```
+
+#### row_design.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/readname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:text="Name"
+        android:textColor="#E91E63"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/readroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="serif"
+        android:text="RollNumber"
+        android:textColor="#3F51B5"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/readMailid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="serif"
+        android:text="Mail ID"
+        android:textColor="#BF3205"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/readmobile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="serif"
+        android:text="RollNumber"
+        android:textColor="#039109"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:contentDescription="Delete"
+        android:src="@drawable/ic_delete_forever_black_24dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="#2196F3" />
+
+</LinearLayout>
+```
+
+#### MyDataAdapter.java
+
+```java
+public class MyDataAdapter extends RecyclerView.Adapter<MyDataAdapter.DataViewHolder> {
+
+    Context ct;
+    List<Student> students;
+
+    public MyDataAdapter(MainActivity mainActivity, List<Student> studentList) {
+        ct = mainActivity;
+        students = studentList;
+    }
+
+    @NonNull
+    @Override
+    public MyDataAdapter.DataViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(ct).inflate(R.layout.row_design, parent, false);
+        return new DataViewHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull MyDataAdapter.DataViewHolder holder, int position) {
+        final Student list = students.get(position);
+        holder.rroll.setText(list.getRollNumber());
+        holder.rname.setText(list.getName());
+        holder.rmobile.setText(list.getMobileNUmber());
+        holder.rmail.setText(list.getMailID());
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.viewModel.delete(list);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return students.size();
+    }
+
+    public class DataViewHolder extends RecyclerView.ViewHolder {
+
+        TextView rname, rmail, rmobile, rroll;
+        ImageView delete;
+
+        public DataViewHolder(@NonNull View itemView) {
+            super(itemView);
+            rname = itemView.findViewById(R.id.readname);
+            rmail = itemView.findViewById(R.id.readMailid);
+            rmobile = itemView.findViewById(R.id.readmobile);
+            rroll = itemView.findViewById(R.id.readroll);
+            delete = itemView.findViewById(R.id.delete);
+        }
+    }
+}
+```
+
+### Output
+
+
 
 
 
