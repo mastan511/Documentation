@@ -130,6 +130,409 @@ public class Student {
 ```
 You can also use annotations to define relationships between entities. For details and a complete list of annotations, see the Room package summary reference.
 
+### The DAO (data access object)
+
+To access your app's data using the Room persistence library, you work with data access objects, or DAOs. A set of Dao objects (DAOs) forms the main component of a Room database. Each DAO includes methods that offer abstract access to your app's database.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_app_architecture_dao.png">
+</p>
+<br>
+
+You annotate the DAO to specify SQL queries and associate them with method calls. The compiler checks the SQL for errors, then generates queries from the annotations. For common queries, the libraries provide convenience annotations, such as _@Insert, @Delete, and @Update_.
+
+Note that:
+
+* The DAO must be an interface or abstract class.
+* Room uses the DAO to create a clean API for your code.
+* By default, queries (@Query) must be executed on a thread other than the main thread. For operations such as inserting or deleting, Room takes care of thread management for you if you use the appropriate annotations.
+* The default action when you ask Room to insert an entity that is already in the database is to ABORT. You can specify a different conflict strategy, such as REPLACE.
+
+```java
+@Dao
+public interface StudentDao {
+
+    @Insert
+    public void insert(Student student);
+
+    @Delete
+    public void delete(Student student);
+
+    @Query("SELECT * FROM StudentInfo")
+    List<Student> readData();
+    
+    // Query with parameter that returns a specific word or words.
+   @Query("SELECT * FROM word_table WHERE word LIKE :word ")
+   public List<Word> findWord(String word);
+}
+```
+Learn more about [Room DAOs](https://developer.android.com/training/data-storage/room/accessing-data.html).
+
+### LiveData
+
+When your app displays data or uses data in other ways, you usually want to take action when the data changes. This means your app has to observe the data so that when it changes, the app can react. Depending on how the data is stored, this can be tricky. Observing changes to data across multiple components of your app can create explicit, rigid dependency paths between the components. This makes testing and debugging, among other things, difficult.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_app_architecture_livedata.png">
+</p>
+<br>
+
+To avoid these problems, use LiveData, which is a [lifecycle library](https://developer.android.com/topic/libraries/architecture/lifecycle.html) class for data observation. If you use a return value of type [LiveData](https://developer.android.com/reference/android/arch/lifecycle/LiveData.html) in your method description, Room generates all necessary code to update the LiveData when the database is updated.
+
+### Benefits of using LiveData
+
+_Ensures that your UI matches your data state_
+
+LiveData follows the [observer pattern](https://en.wikipedia.org/wiki/Observer_pattern), so it notifies [Observer](https://developer.android.com/reference/android/arch/lifecycle/Observer.html) objects when the lifecycle state changes. You can consolidate your code to update the UI within these observer objects. Instead of updating the UI every time the app data changes, your observer can update the UI every time there's a state change.
+
+_No memory leaks_
+
+Observers are bound to [Lifecycle](https://developer.android.com/reference/android/arch/lifecycle/Lifecycle.html) objects, and the observers clean up after themselves when their associated lifecycle is destroyed.
+
+_No crashes due to stopped activities_
+
+If the observer's lifecycle is inactive, as in the case of an activity in the back stack, then it doesn't receive any LiveData events.
+
+_No more manual lifecycle handling_
+
+UI components just observe relevant data and don't stop or resume observation. LiveData is aware of relevant lifecycle status changes while observing, so LiveData automatically manages stopping and resuming observation.
+
+_Data is always up-to-date_
+
+If a lifecycle becomes inactive, it receives the latest data upon becoming active again. For example, an activity that was in the background receives the latest data right after it returns to the foreground.
+
+_Configuration changes handled properly_
+
+If an activity or fragment is re-created due to a configuration change, like device rotation, the activity or fragment immediately receives the latest available data.
+
+_Resources can be shared_
+
+You can extend a LiveData object using the [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) pattern. Do this, for example, for services or a database. The LiveData object connects to the system service once, and then any observer that needs the resource can just watch the LiveData object. For more information, see Extend [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html#extend_livedata).
+
+### Using LiveData
+
+Follow these general steps to work with LiveData objects:
+
+1. Create an instance of [LiveData](https://developer.android.com/topic/libraries/architecture/livedata.html#extend_livedata). to hold a certain type of data. This is usually done within your [ViewModel](https://developer.android.com/reference/android/arch/lifecycle/ViewModel.html) class.
+2. Create an [Observer](https://developer.android.com/reference/android/arch/lifecycle/Observer.html) object that defines the [onChanged()](https://developer.android.com/reference/android/arch/lifecycle/Observer.html#onChanged(T)) method, which controls what happens when the LiveData object's held data changes. You usually create an Observer object in a UI controller, such as an activity or fragment.
+3. Attach the Observer object to the LiveData object using the [observe()](https://developer.android.com/reference/android/arch/lifecycle/LiveData.html#observe(android.arch.lifecycle.LifecycleOwner,%20%20%20android.arch.lifecycle.Observer%3CT%3E)) method. The observe() method takes a LifecycleOwner object. This subscribes the Observer object to the LiveData object so that the observer is notified of changes. You usually attach the Observer object in a UI controller, such as an activity or fragment.
+
+**Note:** You can register an observer without an associated [LifecycleOwner](https://developer.android.com/reference/android/arch/lifecycle/LifecycleOwner.html) object using the [observeForever(Observer)](https://developer.android.com/reference/android/arch/lifecycle/LiveData.html#observeForever(android.arch.lifecycle.Observer%3CT%3E)) method. In this case, the observer is considered to be always active and is therefore always notified about modifications. To remove these observers, call the removeObserver(Observer) method.
+
+When you update the value stored in the LiveData object, all registered observers are notified and will take specified actions, such as updating the UI, as long as the attached LifecycleOwner is in the active state.
+
+LiveData allows UI-controller observers to subscribe to updates. When the data held by the LiveData object changes, the UI automatically updates in response.
+
+These steps are explained in more detail in the rest of this chapter.
+
+### Making data observable with LiveData
+
+To make data observable, wrap it with LiveData. That's it.
+
+For the Person example, in the DAO you would wrap the returned data into LiveData, as shown in this code:
+
+```xml
+@Query("SELECT * FROM StudentInfo")
+    LiveData<List<Student>> readData();
+```
+
+**Important:** When you pass data through the layers of your app architecture from a Room database to your UI, that data has to be LiveData in all layers: All the data that Room returns to the Repository, and the Repository then passes to the ViewModel, must be LiveData. You can then create an observer in the activity that observes the data in the ViewModel.
+
+### MutableLiveData
+
+You can use LiveData independently from Room, but to do so you must manage data updates. However, LiveData has no publicly available methods to update the stored data.
+
+Therefore, if you want to update the stored data, you must use [MutableLiveData](https://developer.android.com/reference/android/arch/lifecycle/MutableLiveData.html) instead of LiveData. The MutableLiveData class adds two public methods that allow you to set the value of a LiveData object: [setValue(T)](https://developer.android.com/reference/android/arch/lifecycle/MutableLiveData.html#setValue(T)) and [postValue(T)](https://developer.android.com/reference/android/arch/lifecycle/MutableLiveData.html#postValue(T)).
+
+MutableLiveData is usually used in the ViewModel, and then the [ViewModel](https://developer.android.com/reference/android/arch/lifecycle/ViewModel.html) only exposes immutable LiveData objects to the observers.
+
+See the Architecture Components' [BasicSample](https://github.com/android/architecture-components-samples/tree/master/BasicSample) code for examples of using MutableLiveData. The example in [Guide to App Architecture](https://developer.android.com/topic/libraries/architecture/guide.html) also shows a use MutableLiveData.
+
+
+### Observing LiveData
+
+To update the data that is shown to the user, create an observer of the data in the onCreate() method of MainActivity and override the observer's onChanged() method. When the LiveData changes, the observer is notified and onChanged() is executed. You then update the cached data, for example in the adapter, and the adapter updates what the user sees.
+
+Usually you observe data in a ViewModel, not directly in the Repository or in Room. ViewModel is described in a later section.
+
+The following code synatx shows how to attach an observer to LiveData:
+```java
+// Create the observer which updates the UI.
+final Observer<String> nameObserver = new Observer<String>() {
+    @Override
+    public void onChanged(@Nullable final String newName) {
+        // Update the UI, in this case, a TextView.
+        mNameTextView.setText(newName);
+    }
+};
+
+mModel.getCurrentName().observe(this, nameObserver);
+```
+
+See the LiveData documentation to learn other ways to use LiveData, or watch this [Architecture Components: LiveData and Lifecycle video](https://www.youtube.com/watch?v=jCw5ib0r9wg).
+
+### Room database
+
+Room is a database layer on top of an SQLite database. Room takes care of mundane tasks that you used to handle with an [SQLiteOpenHelper](https://developer.android.com/reference/android/database/sqlite/SQLiteOpenHelper.html).
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_app_architecture_roomdb.png">
+</p>
+<br>
+
+To use Room:
+
+1. Create a public abstract class that extends RoomDatabase.
+2. Use annotations to declare the entities for the database and set the version number.
+3. Use Room's database builder to create the database if it doesn't exist.
+4. Add a migration strategy for the database. When you modify the database schema, you'll need to update the version number and define how to handle migrations. For a sample, destroying and re-creating the database is a fine migration strategy. For a real app, you must implement a migration strategy. See [Understanding migrations with Room](https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929).
+
+Note that:
+
+* Room provides compile-time checks of SQLite statements.
+* By default, to avoid poor UI performance, Room doesn't allow you to issue database queries on the main thread. LiveData applies this rule by automatically running the query asynchronously on a background thread, when needed.
+* Usually, you only need one instance of the Room database for the whole app. Make your RoomDatabase a singleton to prevent having multiple instances of the database opened at the same time, which would be a bad thing.
+
+Here is a sample of a complete Room class:
+```java
+@Database(entities = {Student.class} , version = 1 , exportSchema = false)
+public abstract class StudentDataBase extends RoomDatabase {
+
+    public abstract StudentDao myDao();
+
+    private static StudentDataBase dataBase;
+
+    static synchronized StudentDataBase getDataBase(Context context){
+        if (dataBase == null){
+            dataBase = Room.databaseBuilder(context,
+                    StudentDataBase.class,"MyDb")
+                    .allowMainThreadQueries()
+                    .fallbackToDestructiveMigration().build();
+        }
+        return dataBase;
+    }
+}
+```
+### Repository
+
+A Repository is a class that abstracts access to multiple data sources. The Repository is not part of the Architecture Components libraries, but is a suggested best practice for code separation and architecture. A Repository class handles data operations. It provides a clean API to the rest of the app for app data.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_app_architecture_repository.png">
+</p>
+<br>
+
+A Repository is where you would put the code to manage query threads and use multiple backends, if appropriate. Once common use for a Repository is to implement the logic for deciding whether to fetch data from a network or use results cached in the database.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_repository.png">
+</p>
+<br>
+
+Here is the complete code for a basic Repository:
+```java
+public class StudentRepository {
+
+    private StudentDataBase studentDataBase;
+    private LiveData<List<Student>> read;
+
+    StudentRepository(Application application) {
+        studentDataBase=StudentDataBase.getDataBase(application);
+        read = studentDataBase.myDao().readData();
+    }
+
+    void insertData(Student student){
+        new InsertTask().execute(student);
+    }
+    void deleteData(Student student){
+        new DeleteTask().execute(student);
+    }
+
+    LiveData<List<Student>> readData(){
+        return read;
+    }
+    
+    class  InsertTask extends AsyncTask<Student,Void,Void>{
+        @Override
+        protected Void doInBackground(Student... students) {
+            studentDataBase.myDao().insert(students[0]);
+            return null;
+        }
+    }
+
+    class DeleteTask extends AsyncTask<Student,Void,Void>{
+        @Override
+        protected Void doInBackground(Student... students) {
+            studentDataBase.myDao().delete(students[0]);
+            return null;
+        }
+    }
+}
+```
+**Note**: In this example, the Repository doesn't do much. See the [BasicSample](https://github.com/android/architecture-components-samples/tree/master/BasicSample) for an applied implementation.
+
+The [Guide to App Architecture] includes a more complex example that uses a web service to fetch data.
+
+### ViewModel
+
+The ViewModel is a class whose role is to provide data to the UI and survive configuration changes. A ViewModel acts as a communication center between the Repository and the UI. You can also use a ViewModel to share data between fragments. The ViewModel is part of the [lifecycle library](https://developer.android.com/topic/libraries/architecture/lifecycle.html). For an introductory guide to this topic, see the ViewModel overview.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_app_architecture_viewmodel.png">
+</p>
+<br>
+
+A ViewModel holds your app's UI data in a lifecycle-conscious way that survives configuration changes. Separating your app's UI data from your Activity and Fragment classes lets you better follow the single responsibility principle: Your activities and fragments are responsible for drawing data to the screen, while your ViewModel is responsible for holding and processing all the data needed for the UI.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_view_model.png">
+</p>
+<br>
+
+**Warning:** Never pass context into ViewModel instances. Do not store Activity, Fragment, or View instances or their Context in the ViewModel. An Activity can be destroyed and created many times during the lifecycle of a ViewModel, such as when the device is rotated. If you store a reference to the Activity in the ViewModel, you end up with references that point to the destroyed Activity. This is a memory leak. If you need the application context, use AndroidViewModel instead of ViewModel.
+
+In the ViewModel, use LiveData for changeable data that the UI will use or display, so that you can add an observer and respond to changes.
+
+Here is the complete code for a sample ViewModel:
+```java
+public class StudentViewModel extends AndroidViewModel {
+
+    private StudentRepository repository;
+    private LiveData<List<Student>> readAllData;
+    public StudentViewModel(@NonNull Application application) {
+        super(application);
+        repository = new StudentRepository(application);
+        readAllData = repository.readData();
+    }
+
+    void insert(Student student){
+        repository.insertData(student);
+    }
+
+    void delete(Student student){
+        repository.deleteData(student);
+    }
+
+    LiveData<List<Student>> readData(){
+        return readAllData;
+    }
+}
+```
+**Important:** ViewModel is not a replacement for onSaveInstanceState(), because the ViewModel does not survive a process shutdown. See [Saving UI States](https://developer.android.com/topic/libraries/architecture/saving-states.html).
+
+To learn more, watch this [Architecture Components: ViewModel video](https://www.youtube.com/watch?v=c9-057jC1ZA).
+
+### Displaying LiveData
+
+Finally, you can display all this interesting data to the user.
+
+<br>
+<p align="center">
+<img  src="https://github.com/mastan511/MastanImages/blob/master/dg_app_architecture_UI.png">
+</p>
+<br>
+
+Whenever the data changes, the onChanged() method of your observer is called.
+
+In the most basic case, this can update the contents of a TextView, as shown in this code:
+```java
+final Observer<String> nameObserver = new Observer<String>() {
+    @Override
+    public void onChanged(@Nullable final String newName) {
+        // Update the UI, in this case, a TextView.
+        mNameTextView.setText(newName);
+    }
+};
+```
+Another common case is to display data in a View that works with an adapter. For example, if you are showing data in a RecyclerView, the onChanged() method updates the data cached in the adapter:
+```java
+        viewModel.readData().observe(this, new Observer<List<Student>>() {
+            @Override
+            public void onChanged(List<Student> students) {
+                rv.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                rv.setAdapter(new MyDataAdapter(MainActivity.this,students));
+            }
+        });
+```
+
+**Tip**: One way to get a reference to the application context in a data repository is to extend the Application class and add a member of type Context to that custom subclass.
+
+### Lifecycle-aware components
+
+Most of the app components that are defined in the Android framework have lifecycles attached to them. Lifecycles are managed by the operating system or the framework code running in your process. They are core to how Android works and your app must respect them. Not doing so may trigger memory leaks or even app crashes. Activities and fragments are examples of lifecycle-aware components, and LiveData is lifecycle aware.
+
+A common pattern is to implement the actions of the dependent components in the lifecycle methods of activities and fragments. For example, you might have a listener class that connects to a service when the activity starts, and disconnects when the activity is stopped. In the activity, you then override the onStart() and onStop() methods to start and stop the listener.
+
+```java
+@Override
+    public void onStart() {
+        super.onStart();
+        myListener.start();
+}
+```
+This code snippet looks innocent enough. However, once you have multiple components, using this pattern leads to poor code organization and a proliferation of errors, such as possible race conditions.
+
+Lifecycle-aware components perform actions in response to a change in the lifecycle status of another component. For example, a listener could start and stop itself in response to an activity starting and stopping. This results in code that is better-organized, usually shorter, and always easier to maintain.
+
+The android.arch.lifecycle package provides classes and interfaces that let you build lifecycle-aware components that automatically adjust their behavior based on the lifecycle state of an activity or fragment. That is, you can make any class lifecycle aware.
+
+* To import android.arch.lifecycle into your Android project, see [Adding Components to your Project](https://developer.android.com/topic/libraries/architecture/adding-components.html).
+* See [Handling Lifecycles with Lifecycle-Aware Components](https://developer.android.com/topic/libraries/architecture/lifecycle.html) for more details on using these components.
+    
+### Use cases for lifecycle-aware components
+
+Lifecycle-aware components can make it much easier for you to manage lifecycles in a variety of cases. For example, you can use lifecycle-aware components to:
+
+* Switch between coarse and fine-grained location updates.
+
+  Use lifecycle-aware components to enable fine-grained location updates while your location app is visible, then switch to coarse-grained updates when the app is in the           background. Add LiveData to automatically update the UI when your user changes locations.
+  
+* Stop and start video buffering.
+
+Use lifecycle-aware components to start video buffering as soon as possible, but defer playback until the app is fully started. You can also use lifecycle-aware components to end buffering when your app is destroyed.
+
+* nStart and stop network connectivity.
+
+Use lifecycle-aware components to enable live updating (streaming) of network data while an app is in the foreground, then automatically pause when the app moves into the background.
+
+* Pause and resume animated drawables.
+
+Use lifecycle-aware components to pause animated drawables while the app is in the background, then resume drawables after the app returns to the foreground.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
