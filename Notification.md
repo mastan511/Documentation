@@ -193,3 +193,73 @@ NotificationCompat notif = new NotificationCompat.Builder(mContext, channelId)
         .setBigContentTitle("Large Notification Title"))
     .build();
  ```
+
+### Ongoing notifications
+Ongoing notifications are notifications that the user can't dismiss. Use ongoing notifications for background tasks that the user actively engages with, for example playing music. You can also use ongoing notifications to show tasks that are occupying the device, for example file downloads, sync operations, and active network connections.
+
+Ongoing notifications can be a nuisance to your users, because users can't cancel them, so use them sparingly.
+
+To make a notification ongoing, set setOngoing() to true.
+
+Your app must explicitly cancel ongoing notifications by calling cancel() or cancelAll().
+
+
+
+### Delivering notifications
+Use the NotificationManager class to deliver notifications:
+
+- To create an instance of NotificationManager, call getSystemService(), passing in the NOTIFICATION_SERVICE constant.
+- To deliver the notification, call notify().
+
+Pass these two values in the notify() method:
+
+- A notification ID, which is used to update or cancel the notification.
+- The NotificationCompat object that you created using the NotificationCompat.Builder object.
+
+
+The following example creates a NotificationManager instance, then builds and delivers a notification:
+
+```java
+mNotifyManager = (NotificationManager) 
+                       getSystemService(NOTIFICATION_SERVICE);
+
+//Builds the notification with all the parameters
+NotificationCompat.Builder notifyBuilder = 
+                new NotificationCompat.Builder(this, PRIMARY_CHANNEL)
+       .setContentTitle(getString(R.string.notification_title))
+       .setContentText(getString(R.string.notification_text))
+       .setSmallIcon(R.drawable.ic_android)
+       .setContentIntent(notificationPendingIntent)
+       .setPriority(NotificationCompat.PRIORITY_HIGH)
+ ```
+ ```java
+  .setDefaults(NotificationCompat.DEFAULT_ALL);
+
+//Delivers the notification
+mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
+ ```
+ 
+ 
+### Updating and reusing notifications
+Sometimes you need to issue a notification multiple times for the same type of event. In this situation, you can update a previous notification by changing some of the notification's values, adding to the notification, or both.
+
+
+To reuse an existing notification:
+
+- Update a NotificationCompat.Builder object and build a Notification object from it, as when you first created and built the notification.
+- Deliver the notification with the same ID you used previously.
+
+            Important: If the previous notification is still visible, the system updates it from the contents of the Notification object. 
+            If the previous notification has been dismissed, a new notification is created and displayed.
+### Clearing notifications
+Notifications remain visible until one of the following happens:
+
+- If the notification can be cleared, it disappears when the user dismisses it by swiping it or by using "Clear All".
+- If you called setAutoCancel() when you created the notification, the notification cancels itself automatically. When the user taps the notification, the notification is removed from the status bar.
+- If you call cancel() on the Notification object for a specific notification ID, the notification is removed from the status bar.
+- If you call cancelAll() on the Notification object, all the notifications you've issued are removed from the status bar.
+
+Because the user can't cancel ongoing notifications, your app must cancel them by calling cancel() or cancelAll() on the Notification object.
+ 
+ 
+ 
