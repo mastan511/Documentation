@@ -391,6 +391,6 @@ enqueue() asynchronously sends the request and notifies your app with a callback
 
 ## Output Screen 
 
-<img src="https://github.com/Muneiahtellakula/kotlin-learningTasks/blob/master/20200531_130811-ANIMATION.gif">
+<img src="https://github.com/mastan511/MastanImages/blob/master/r1.gif" height=400 width=300>
 
 
