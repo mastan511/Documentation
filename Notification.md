@@ -109,3 +109,87 @@ The NotificationCompat.Builder constructor takes the notification channel ID as 
 ### Set notification contents
 You can assign components to the notification like a small icon, a title, and the notification message.
 <img class="center " style="max-width: 435.00px" src="https://github.com/mastan511/MastanImages/blob/master/7.png" alt=" Notification contents" title=" Notification contents">
+
+In the screenshot above:
+
+1. A small icon, set by setSmallIcon(). This is the only content that's required.
+2. A title, set by setContentTitle().
+3. The body text, set by setContentText(). This text must be fewer than 40 characters, and it should not repeat what is in the title.
+```java
+NotificationCompat.Builder mBuilder =
+new NotificationCompat.Builder(this, CHANNEL_ID)
+        .setSmallIcon(R.drawable.android_icon)
+        .setContentTitle("You've been notified!")
+        .setContentText("This is your notification text.");
+```
+### Set the intent for the notification's tap action
+Every notification must respond when it is tapped, usually by launching an Activity in your app. To launch an Activity in your app, set a content intent using the setContentIntent() method, passing in the Intent wrapped in a PendingIntent object. When your app uses a PendingIntent, the system can launch the Activity in your app on your behalf.
+
+To instantiate a PendingIntent, use one of the following methods, depending on how you want the contained Intent to be delivered:
+
+- To launch an Activity when a user taps the notification, use PendingIntent.getActivity(). Pass in an explicit Intent for the Activity you want to launch. The getActivity() method corresponds to an Intent delivered using startActivity().
+- For an Intent passed into startService(), for example a service to download a file, use PendingIntent.getService().
+- For a broadcast Intent delivered with sendBroadcast(), use PendingIntent.getBroadcast().
+
+
+Each of these PendingIntent methods takes the following arguments:
+
+- The application context.
+- A request code, which is a constant integer ID for the PendingIntent.
+- The Intent to be delivered.
+- A PendingIntent flag that determines how the system handles multiple PendingIntent objects from the same app.
+
+The following snippet shows how to create a basic Intent to open an Activity when the user taps the notification:
+```java
+// Create an explicit intent for an Activity in your app
+Intent contentIntent = new Intent(this, ExampleActivity.class);
+PendingIntent pendingContentIntent = PendingIntent.getActivity(this, 0,          
+                         contentIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+// Set the intent that will fire when the user taps the notification
+mBuilder.setContentIntent(pendingContentIntent);
+```
+### Add notification action buttons
+Notification action buttons allow the user to perform an app-related task without launching the app. The system typically displays action buttons adjacent to the notification content. A notification can have up to three notification action buttons.
+
+<img class="center " style="max-width: 437.00px" src="https://github.com/mastan511/MastanImages/blob/master/8.png" alt=" Notification action buttons" title=" Notification action buttons">
+
+1. "Learn more" and "Update" action buttons
+
+Using action buttons, you can let the user perform a variety of actions, beyond just launching an Activity after the user taps the notification itself. For example, you can use action buttons to let the user start a background task to upload a file, place a phone call, snooze an alarm, or play music. For Android 7.0 (API level 24) and higher, you can use an action button to let the user reply to a message directly from a notification.
+
+Adding an action button is similar to setting up the notification's default tap action: pass a PendingIntent to the addAction() method in the NotificationCompat.Builder class. But this action should not replicate what happens when the user taps the notification itself.
+
+The following code shows how to add an action button using the addAction() method with the NotificationCompat.Builder object, passing in the icon, the title string for the label, and the PendingIntent to trigger when the user taps the action button.
+
+```java
+mBuilder.addAction(R.drawable.car, "Get Directions", mapPendingIntent);
+```
+Starting from Android 7.0, icons are not displayed in notifications. Instead, more room is provided for the notification labels themselves. But notification action icons are still required, and they are used on older versions of Android and on devices such as Android Wear.
+
+### Expandable notifications
+Notifications in the notification drawer appear in two main layouts, normal view (which is the default) and expanded view. Expanded view notifications were introduced in Android 4.1. Use them sparingly, because they take up more space and attention than normal view layouts.
+
+To create notifications that appear in an expanded layout, use one of these helper classes to set the style object to the setStyle() method:
+- Use NotificationCompat.BigTextStyle for large-format notifications that include a lot of text.
+- Use NotificationCompat.InboxStyle for displaying a list of summary lines, for example for incoming messages or emails.
+- Use NotificationCompat.MediaStyle for media playback notifications.
+- Use NotificationCompat.MessagingStyle to display sequential messages in an ongoing conversation. This style currently applies only on devices running Android 7.0 and higher. On lower devices, these notifications are displayed in the supported style.
+- Use NotificationCompat.BigPictureStyle for large-format notifications that include large image attachments, as shown in the screenshot below.
+
+
+
+<img class="center " style="max-width: 339.00px" src="https://github.com/mastan511/MastanImages/blob/master/9.png" alt=" Notification with <code>BigPictureStyle</code> expanded layout" title=" Notification with <code>BigPictureStyle</code> expanded layout">
+
+For example, here's how you'd set the BigPictureStyle on a notification:
+```java
+NotificationCompat notif = new NotificationCompat.Builder(mContext, channelId)
+    .setContentTitle("New photo from " + sender.toString())
+    .setContentText(subject)
+    .setSmallIcon(R.drawable.new_post)
+    .setLargeIcon(aBitmap)
+    .setStyle(new NotificationCompat.BigPictureStyle()
+        .bigPicture(aBigBitmap)
+        .setBigContentTitle("Large Notification Title"))
+    .build();
+ ```
