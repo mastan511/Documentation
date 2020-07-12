@@ -81,4 +81,15 @@ ViewModel objects are designed to outlive specific instantiations of views or Li
 
 <img src="https://raw.githubusercontent.com/mastan511/MastanImages/master/v2.png" width=400 >
 
+- Now we can see by using ViewModel how to save the data which is available on the screen in potraite mode in landscape mode also we should have to display the same content as well.
+
+## ViewModel Implementation.
+- Let's create 
+
+
+
+
+
+
+
 
