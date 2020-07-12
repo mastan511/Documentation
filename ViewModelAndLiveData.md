@@ -60,10 +60,25 @@ ViewModel objects are designed to outlive specific instantiations of views or Li
 
 [Please download and import this starter App code Into your Android Studio](https://github.com/mastan511/ViewModelandLiveData-startercode/tree/master/ViewModelWithLiveData_starter)
 
+
+
+
+
+
 **OutPut of the above starter code**
+
+
 **In Potraite Mode**
+
+
 <img src="https://raw.githubusercontent.com/mastan511/MastanImages/master/v1.png"  height=300 > 
+
+
+
 **LandScape Mode**
+
+
+
 <img src="https://raw.githubusercontent.com/mastan511/MastanImages/master/v2.png" width=400 >
 
 
