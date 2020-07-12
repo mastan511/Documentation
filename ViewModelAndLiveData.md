@@ -53,6 +53,15 @@ ViewModel objects are designed to outlive specific instantiations of views or Li
 
 ![](https://developer.android.com/images/topic/libraries/architecture/viewmodel-lifecycle.png)
 
+
+
+
+## Starter App for ViewModel Example
+
+[Please download and import this starter code](https://github.com/mastan511/ViewModelandLiveData-startercode/tree/master/ViewModelWithLiveData_starter)
+
+
+
 ## ViewModel and Dependen
 
 
