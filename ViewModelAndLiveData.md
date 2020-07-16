@@ -1,4 +1,5 @@
-# ViewModel
+# ViewModel and LiveData
+## ViewModel
 The ViewModel class is designed to store and manage UI-related data in a lifecycle conscious way. The ViewModel class allows data to survive configuration changes such as screen rotations.
 
 The Android framework manages the lifecycles of UI controllers, such as activities and fragments. The framework may decide to destroy or re-create a UI controller in response to certain user actions or device events that are completely out of your control.
@@ -84,8 +85,57 @@ ViewModel objects are designed to outlive specific instantiations of views or Li
 - Now we can see by using ViewModel how to save the data which is available on the screen in potraite mode in landscape mode also.
 
 ## ViewModel Implementation.
-- Let's create one ViewModel class with the name of MainViewModel 
+- First we should have add the dependency
+```gradle
+def lifecycle_version = "2.2.0"
 
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+  
+```
+- Lets create a one java class with the name of MainViewModel.java and this class must be extended with ViewModel class.
+
+```java
+import androidx.lifecycle.ViewModel;
+
+public class MainViewModel extends ViewModel {
+    
+    public MainViewModel() {
+        Log.i("MainViewModel","ViewModel is created");
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Log.i("MainViewModel","ViewModel is destroyed");
+    }
+    
+}
+
+```
+- Lets call that ViewModel class into the MainActivity.java
+```java
+
+public class MainActivity extends AppCompatActivity {
+
+    private int count = 0;
+    private TextView count_tv;
+    private MainViewModel mvm;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //Initialize the viewmodel
+        mvm = new ViewModelProvider(this).get(MainViewModel.class);
+        Log.i("MainActivity","MainViewModel is initialized");
+        count_tv = findViewById(R.id.count_textView); // Connecting the count_textView with count_tv TextView Instance
+    }
+
+```
+- now you can run the app check the logcat messages in both(Potraite and Landscape) Modes. When you rotate ypur device from potraite to landscape the ViewModel class id reinitialized that means it will not create the ViewModel again.
+
+0![](https://raw.githubusercontent.com/mastan511/MastanImages/master/viewModellogcat.PNG)
 
 
 
