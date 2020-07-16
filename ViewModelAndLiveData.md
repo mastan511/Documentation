@@ -232,10 +232,135 @@ public class MainActivity extends AppCompatActivity {
 
 <img src='https://raw.githubusercontent.com/mastan511/MastanImages/master/vl.png' width=400>
 
+## LiveData
+
+LiveData is an observable data holder class. Unlike a regular observable, LiveData is lifecycle-aware, meaning it respects the lifecycle of other app components, such as activities, fragments, or services. This awareness ensures LiveData only updates app component observers that are in an active lifecycle state.
+
+LiveData considers an observer, which is represented by the Observer class, to be in an active state if its lifecycle is in the STARTED or RESUMED state. LiveData only notifies active observers about updates. Inactive observers registered to watch LiveData objects aren't notified about changes.
+
+You can register an observer paired with an object that implements the LifecycleOwner interface. This relationship allows the observer to be removed when the state of the corresponding Lifecycle object changes to DESTROYED. This is especially useful for activities and fragments because they can safely observe LiveData objects and not worry about leaks—activities and fragments are instantly unsubscribed when their lifecycles are destroyed.
+
+### The advantages of using LiveData
+
+**Ensures your UI matches your data state**
+LiveData follows the observer pattern. LiveData notifies Observer objects when the lifecycle state changes. You can consolidate your code to update the UI in these Observer objects. Instead of updating the UI every time the app data changes, your observer can update the UI every time there's a change.
+**No memory leaks**
+Observers are bound to Lifecycle objects and clean up after themselves when their associated lifecycle is destroyed.
+**No crashes due to stopped activities**
+If the observer's lifecycle is inactive, such as in the case of an activity in the back stack, then it doesn’t receive any LiveData events.
+**No more manual lifecycle handling**
+UI components just observe relevant data and don’t stop or resume observation. LiveData automatically manages all of this since it’s aware of the relevant lifecycle status changes while observing.
+**Always up to date data**
+If a lifecycle becomes inactive, it receives the latest data upon becoming active again. For example, an activity that was in the background receives the latest data right after it returns to the foreground.
+**Proper configuration changes**
+If an activity or fragment is recreated due to a configuration change, like device rotation, it immediately receives the latest available data.
+**Sharing resources**
+You can extend a LiveData object using the singleton pattern to wrap system services so that they can be shared in your app. The LiveData object connects to the system service once, and then any observer that needs the resource can just watch the LiveData object. For more information, see Extend LiveData.
+
+### Implementation of LiveData.
+- First we should have to add the dependency.
+```gradle
+ def lifecycle_version = "2.2.0"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+
+```
+**MainViewModel.Java**
+```java
+package com.example.viewmodelandlivedata;
+
+import android.util.Log;
+
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+public class MainViewModel extends ViewModel {
+    //public int count = 0;
+    MutableLiveData<Integer> count = new MutableLiveData<>();
+    public MainViewModel() {
+        Log.i("MainViewModel","ViewModel is created");
+        count.setValue(0);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Log.i("MainViewModel","ViewModel is destroyed");
+    }
+
+   public void increment(){
+        count.setValue(count.getValue()+1);
+    }
+    public void decreament(){
+        count.setValue(count.getValue()-1);
+    }
+
+}
 
 
+```
+**MainActivity.Java**
+```java
+package com.example.viewmodelandlivedata;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
 
 
+    private TextView count_tv;
+    private MainViewModel mvm;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //Initialize the viewmodel
+        mvm = new ViewModelProvider(this).get(MainViewModel.class);
+        Log.i("MainActivity","MainViewModel is initialized");
+        count_tv = findViewById(R.id.count_textView); // Connecting the count_textView with count_tv TextView Instance
+        //count_tv.setText(String.valueOf(mvm.count));
+        mvm.count.observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                count_tv.setText(String.valueOf(integer));
+
+            }
+        });
+    }
+
+    /*The Following method, when invoked, increases the value on the
+     * textview by 1.*/
+    public void increment(View view)
+    {
+        //count++;
+        mvm.increment();
+        //count_tv.setText(String.valueOf(mvm.count));
+        //reducing the current value by 1
+        //count_tv.setText(String.valueOf(count));// Setting the value of Count on the count textview on UI.
+        // String.value() - converts the type of count value from Integer to String
+    }
+
+    /*The Following method, when invoked, decreases the value on the
+     * textview by 1.*/
+    public void decrement(View view)
+    {
+        mvm.decreament();
+        //count_tv.setText(String.valueOf(mvm.count));
+        //count--;                                 // reducing the current value by 1
+        //count_tv.setText(String.valueOf(count)); // Setting the value of Count on the count textview on UI.
+        // String.value() - converts the type of count value from Integer to String
+    }
+}
+
+```
 
 
 
