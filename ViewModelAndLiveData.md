@@ -224,11 +224,11 @@ public class MainActivity extends AppCompatActivity {
 }
 
 ```
-**Potraite Mode Output:
+**Potraite Mode Output:**
 
 <img src='https://raw.githubusercontent.com/mastan511/MastanImages/master/v1.png' height=300>
 
-**LandScape Mode Ouput:
+**LandScape Mode Ouput:**
 
 <img src='https://raw.githubusercontent.com/mastan511/MastanImages/master/vl.png' width=400>
 
