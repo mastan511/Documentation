@@ -135,7 +135,103 @@ public class MainActivity extends AppCompatActivity {
 ```
 - now you can run the app check the logcat messages in both(Potraite and Landscape) Modes. When you rotate ypur device from potraite to landscape the ViewModel class id reinitialized that means it will not create the ViewModel again.
 
-0![](https://raw.githubusercontent.com/mastan511/MastanImages/master/viewModellogcat.PNG)
+![](https://raw.githubusercontent.com/mastan511/MastanImages/master/viewModellogcat.PNG)
+
+
+**MainViewModel.Java**
+
+```java
+package com.example.viewmodelandlivedata;
+
+import android.util.Log;
+
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+public class MainViewModel extends ViewModel {
+    public int count = 0;
+    public MainViewModel() {
+        Log.i("MainViewModel","ViewModel is created");
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Log.i("MainViewModel","ViewModel is destroyed");
+    }
+
+   public void increment(){
+        count++;
+    }
+    public void decreament(){
+        count--;
+    }
+
+}
+
+```
+**MainActivity.Java
+```java
+package com.example.viewmodelandlivedata;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+
+    private TextView count_tv;
+    private MainViewModel mvm;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //Initialize the viewmodel
+        mvm = new ViewModelProvider(this).get(MainViewModel.class);
+        Log.i("MainActivity","MainViewModel is initialized");
+        count_tv = findViewById(R.id.count_textView); // Connecting the count_textView with count_tv TextView Instance
+        count_tv.setText(String.valueOf(mvm.count));
+    }
+
+    /*The Following method, when invoked, increases the value on the
+     * textview by 1.*/
+    public void increment(View view)
+    {
+        //count++;
+        mvm.increment();
+        count_tv.setText(String.valueOf(mvm.count));
+        //reducing the current value by 1
+        //count_tv.setText(String.valueOf(count));// Setting the value of Count on the count textview on UI.
+        // String.value() - converts the type of count value from Integer to String
+    }
+
+    /*The Following method, when invoked, decreases the value on the
+     * textview by 1.*/
+    public void decrement(View view)
+    {
+        mvm.decreament();
+        count_tv.setText(String.valueOf(mvm.count));
+        //count--;                                 // reducing the current value by 1
+        //count_tv.setText(String.valueOf(count)); // Setting the value of Count on the count textview on UI.
+        // String.value() - converts the type of count value from Integer to String
+    }
+}
+
+```
+**Potraite Mode Output:
+
+<img src='https://raw.githubusercontent.com/mastan511/MastanImages/master/v1.png' height=300>
+
+**LandScape Mode Ouput:
+
+<img src='https://raw.githubusercontent.com/mastan511/MastanImages/master/vl.png' width=400>
+
 
 
 
