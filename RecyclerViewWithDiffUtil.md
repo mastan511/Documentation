@@ -264,4 +264,5 @@ public class MainActivity extends AppCompatActivity {
 }
 
 ```
-
+**OutPut:
+![](https://raw.githubusercontent.com/mastan511/MastanImages/master/recyclerview.png)
