@@ -1,5 +1,41 @@
-# What is Retrofit
+# Retrofit
+## What is Retrofit
 Retrofit is a REST Client for Java and Android. It makes it relatively easy to retrieve and upload JSON (or other structured data) via a REST based webservice. In Retrofit you configure which converter is used for the data serialization. Typically for JSON you use GSon, but you can add custom converters to process XML or other protocols. Retrofit uses the OkHttp library for HTTP requests.
+
+## Using Retrofit
+To work with Retrofit you basically need the following three classes:
+
+- Model class which is used as a JSON model
+
+- Interfaces that define the possible HTTP operations
+
+- Retrofit.Builder class - Instance which uses the interface and the Builder API to allow defining the URL end point for the HTTP operations.
+
+Every method of an interface represents one possible API call. It must have a HTTP annotation (GET, POST, etc.) to specify the request type and the relative URL. The return value wraps the response in a Call object with the type of the expected result.
+```java
+@GET("users")
+Call<List<User>> getUsers();
+```
+You can use replacement blocks and query parameters to adjust the URL. A replacement block is added to the relative URL with **{}**. With the help of the **@Path** annotation on the method parameter, the value of that parameter is bound to the specific replacement block.
+
+```java
+@GET("users/{name}/commits")
+Call<List<Commit>> getCommitsByName(@Path("name") String name);
+
+```
+Query parameters are added with the **@Query** annotation on a method parameter. They are automatically added at the end of the URL.
+
+```java
+@GET("users")
+Call<User> getUserById(@Query("id") Integer id);
+
+```
+The **@Body** annotation on a method parameter tells Retrofit to use the object as the request body for the call.
+
+```java
+@POST("users")
+Call<User> postUser(@Body User user)
+```
 
 
 
