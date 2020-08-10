@@ -36,6 +36,8 @@ The **@Body** annotation on a method parameter tells Retrofit to use the object 
 @POST("users")
 Call<User> postUser(@Body User user)
 ```
+## Practical Example for Retrofit
+
 
 
 
