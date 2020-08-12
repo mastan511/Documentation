@@ -55,17 +55,166 @@ In the above url also we have a 3 parts:
 Lets create a new androidstudio projet with the name of **BookSearch**
 - Select the EmptyActivity
 
-After creating the project you should have to add the below dependencys
+After creating the project you should have to add the below dependencies:
+```gradle
+dependencies 
+{
+    implementation 'com.squareup.retrofit2:retrofit:2.8.1'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
+   
+}
+```
+If your app will crash then only use below compileOption 
+```gradle
+android 
+{
+  compileOptions 
+	{
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+  	}
+}
+```
+
 
 In the **activity_main.xml** file you should have take a 3 views i.e
 - EditText for to enter the bookname
 - Button for to search the bookdetails
 - Textview for to display the bookdetails
 
+**activity_main.xml**
+```xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edittext"
+        android:hint="Enter bookname"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:onClick="search"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Result"
+        android:textSize="25sp"
+        android:id="@+id/result"
+        />
+</LinearLayout>
+    
+```
+**MainActivity.java**
+```java
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText et_bookname;
+    TextView tv_result;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        et_bookname = findViewById(R.id.edittext);
+        tv_result = findViewById(R.id.result);
+    }
+
+    public void search(View view) {
+        String bookName = et_bookname.getText().toString();
+        
+    }
+}
+
+```
+
+Now its time to create a one Interface to get the json response.
+
+```java
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
+
+public interface BookSearchService {
+    @GET("books/v1/volumes")
+    Call<String> getRepos(@Query("q") String name);
+}
+```
+
+In the **MainActivity.Java** file you should have to create a object for **Retrofit** class
+
+```java
+Retrofit retrofit = new Retrofit.Builder().baseUrl("https://www.googleapis.com/")
+                .addConverterFactory(ScalarsConverterFactory.create()).build();
+```
+
+with in the **search** method you shoud have to get the response.
+```java
+
+ public void search(View view) {
+        String bookName = et_bookname.getText().toString();
+        BookSearchService service = retrofit.create(BookSearchService.class);
+        Call<String> response=service.getRepos(bookName);
+        response.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Toast.makeText(MainActivity.this, ""+response.body(), Toast.LENGTH_SHORT).show();
+                String res = response.body();
+                try {
+                    JSONObject object = new JSONObject(res);
+                    JSONArray jsonArray = object.getJSONArray("items");
+                    JSONObject indexObject=jsonArray.getJSONObject(0);
+                    JSONObject volumeInfo = indexObject.getJSONObject("volumeInfo");
+                    String name = volumeInfo.getString("title");
+                    String authors = volumeInfo.getString("authors");
+                    tv_result.setText(name+"\n"+authors);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
 
 
 
+```
 
+The last step you should have to provide the internet permission with in **AndroidManifest.xml** file
+
+```xml
+
+<uses-permission android:name="android.permission.INTERNET"/>
+
+```
+
+**OutPut**
+
+<img src="https://raw.githubusercontent.com/mastan511/MastanImages/master/Booksapi.png" width=300, height=300>
 
 
 
