@@ -55,6 +55,8 @@ In the above url also we have a 3 parts:
 Lets create a new androidstudio projet with the name of **BookSearch**
 - Select the EmptyActivity
 
+After creating the project you should have to add the below dependencys
+
 In the **activity_main.xml** file you should have take a 3 views i.e
 - EditText for to enter the bookname
 - Button for to search the bookdetails
