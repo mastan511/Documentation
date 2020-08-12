@@ -38,6 +38,36 @@ Call<User> postUser(@Body User user)
 ```
 ## Practical Example for Retrofit
 
+Here we will work on Google books api, In this books api by using book name we can search the books details like authors,title,Book Image 
+
+[https://www.googleapis.com/books/v1/volumes?q=two%20states](https://www.googleapis.com/books/v1/volumes?q=two%20states) This is the url to get the book details based on book name.
+
+Basically every url is devided into the 3 parts:
+- Base Url
+- path
+- Query
+
+In the above url also we have a 3 parts:
+- Base Url => https://www.googleapis.com/
+- path => books/v1/volumes
+- Query => q=two%20states
+
+Lets create a new androidstudio projet with the name of **BookSearch**
+- Select the EmptyActivity
+
+In the **activity_main.xml** file you should have take a 3 views i.e
+- EditText for to enter the bookname
+- Button for to search the bookdetails
+- Textview for to display the bookdetails
+
+
+
+
+
+
+
+
+
 
 
 
