@@ -195,6 +195,88 @@ public class DbHelper extends SQLiteOpenHelper {
 }
 
 ```
+- Let's create some static constant String varibles and int varibles in the DbHelper class.
+
+```java
+    public static final String DB_NAME="SqlDb";
+    public static final String TABLE_NAME="users";
+    public static final String COL_0="id";
+    public static final String COL_1="name";
+    public static final String COL_2="mobileno";
+    public static final int VERSION=1;
+    public static final String TABLE_QUERY = "create table if not exists "+TABLE_NAME+"("+COL_0+" integer primary key autoincrement,"+COL_1+" varchar(200),"+COL_2+" varchar(10));";
+```
+
+**ContentValues Class**
+ContentValue class lets you put information inside an object in the form of Key-Value pairs for columns and their value. The object can then be passed to the insert() method of an instance of the SQLiteDatabase class to insert or update your WritableDatabase.
+
+**Cursor Class**
+Cursor on the other hand, is a kind of a pointer(not the C/C++ one) which you get after calling the query() method on an instance of a ReadableDatabase of the SQLiteDatabase class. The cursor points to individual rows retuned after querying the database and you can use several methods like getInt(), getString() etc to extract information from specific columns of the current row. You can also traverse rows using methods like moveToNext(), moveToFirst() etc on the cursor object
+
+- let's add two methods in the DBHelper class for,to insert the data into the table and retrive the data from the table. i.e **insertMyData()** and **retriveMydata()**
+
+```java
+public long insertMyData(ContentValues contentValues){
+        SQLiteDatabase db = getWritableDatabase();
+        long i = db.insert(TABLE_NAME,null,contentValues);
+        return i;
+    }
+
+    public Cursor retriveMydata(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT *FROM "+TABLE_NAME,null);
+        return c;
+    }
+
+```
+- Now its time to call that DbHelper class into the MainActivity.Java 
+```java
+
+DbHelper helper = new DbHelper(this);
+
+```
+- when we click the saveButton it will invokes **saveData()** method, So now we should have to assign users data to the ContentValues class object. After that we can send send our ContentValues calss object to the **insertMyData()** which is available in the DbHelper class.
+```java
+
+  private void saveData() {
+        String name = et_name.getText().toString();
+        String mobileno = et_mobileno.getText().toString();
+        ContentValues values=new ContentValues();
+        values.put(DbHelper.COL_1,name);
+        values.put(DbHelper.COL_2,mobileno);
+        long i = helper.insertMyData(values);
+        if(i>0){
+            Toast.makeText(this, 
+                    "Data inserted Successfully", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, 
+                    "Insertion Failed", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+```
+- Now we should have to retrive the data from the table
+
+```java
+
+private void retriveData() {
+        Cursor c = helper.retriveMydata();
+        StringBuilder builder = new StringBuilder();
+        while (c.moveToNext()){
+            builder.append(c.getInt(0)+" "+c.getString(1)+" "+c.getString(2)+"\n");
+        }
+        tv_result.setText(builder.toString());
+    }
+
+
+```
+
+
+
+
+
+
 
 
 
