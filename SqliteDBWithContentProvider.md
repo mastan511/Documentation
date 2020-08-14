@@ -165,6 +165,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 }
 
 ```
+- It's time to create a **DbHelper** class extends with **SqliteOpenHelper** class
+- After creating the class implement the required methods i.e **onCrete()** and **onUpgrade()**
+- And also implement the Constructor mathing with super class,
+
+**DbHelper.Java**
+```java
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import androidx.annotation.Nullable;
+
+public class DbHelper extends SQLiteOpenHelper {
+    
+    public DbHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+
+    }
+}
+
+```
+
+
+
+
+
 
 
 
