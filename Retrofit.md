@@ -36,6 +36,23 @@ The **@Body** annotation on a method parameter tells Retrofit to use the object 
 @POST("users")
 Call<User> postUser(@Body User user)
 ```
+
+## CONVERTERS
+By default, Retrofit can only deserialize HTTP bodies into OkHttp's ResponseBody type and it can only accept its RequestBody type for @Body.
+
+Converters can be added to support other types. Six sibling modules adapt popular serialization libraries for your convenience.
+
+- **Gson:** com.squareup.retrofit2:converter-gson
+- **Jackson:** com.squareup.retrofit2:converter-jackson
+- **Moshi:** com.squareup.retrofit2:converter-moshi
+- **Protobuf:** com.squareup.retrofit2:converter-protobuf
+- **Wire:** com.squareup.retrofit2:converter-wire
+- **Simple XML:** com.squareup.retrofit2:converter-simplexml
+- **JAXB:** com.squareup.retrofit2:converter-jaxb
+- **Scalars (primitives, boxed, and String):** com.squareup.retrofit2:converter-scalars
+
+
+
 ## Practical Example for Retrofit
 
 Here we will work on Google books api, In this books api by using book name we can search the books details like authors,title,Book Image 
@@ -60,7 +77,7 @@ After creating the project you should have to add the below dependencies:
 dependencies 
 {
     implementation 'com.squareup.retrofit2:retrofit:2.8.1'
-    implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.7.2'
    
 }
 ```
