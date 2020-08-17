@@ -265,4 +265,8 @@ public class MainActivity extends AppCompatActivity {
 
 ```
 **OutPut:**
+
+
+
+
 <img src="https://raw.githubusercontent.com/mastan511/MastanImages/master/recyclerview.png" width=200 height=400>
