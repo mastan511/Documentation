@@ -139,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_result = findViewById(R.id.resultTextview);
         saveButton = findViewById(R.id.saveButton);
         retriveButton = findViewById(R.id.retriveButton);
+        saveButton.setOnClickListener(this);
+        retriveButton.setOnClickListener(this);
     }
 
     @Override
