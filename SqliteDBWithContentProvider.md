@@ -308,7 +308,7 @@ Sr.No |	Part & Description
 3|**data_type** This indicates the type of data that this particular provider provides. For example, if you are getting all the contacts from the Contacts content provider, then the data path would be people and URI would look like thiscontent://contacts/people
 4|**id** This specifies the specific record requested. For example, if you are looking for contact number 5 in the Contacts content provider then URI would look like this content://contacts/people/5.
 
-**Create Content Provider**
+## Create Content Provider
 This involves number of simple steps to create your own content provider.
 
 - First of all you need to create a Content Provider class that extends the ContentProviderbaseclass.
@@ -324,6 +324,19 @@ This involves number of simple steps to create your own content provider.
 Here is the list of methods which you need to override in Content Provider class to have your Content Provider working −
 
 <img src = "https://raw.githubusercontent.com/mastan511/MastanImages/master/cp1.jpg">
+
+
+- onCreate() This method is called when the provider is started.
+
+- query() This method receives a request from a client. The result is returned as a Cursor object.
+
+- insert()This method inserts a new record into the content provider.
+
+- delete() This method deletes an existing record from the content provider.
+
+- update() This method updates an existing record from the content provider.
+
+- getType() This method returns the MIME type of the data at the given URI.
 
 
 
