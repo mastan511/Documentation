@@ -260,6 +260,144 @@ Notifications remain visible until one of the following happens:
 - If you call cancelAll() on the Notification object, all the notifications you've issued are removed from the status bar.
 
 Because the user can't cancel ongoing notifications, your app must cancel them by calling cancel() or cancelAll() on the Notification object.
+
+### Codelab For Notification
+1. In Android Studio, create a new project called "Notify Me!" Accept the default options, and use the Empty Activity template.
+2. In your activity_main.xml layout file, replace the default TextView with a button that has the following attributes:
+
+
+```xml
+
+ <Button
+       android:id="@+id/notify"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Notify Me!"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintLeft_toLeftOf="parent"
+       app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+
+```
+
+Do the following steps in the MainActivity.java file:
+
+- Create a member variable for the Notify Me! button:
+
+```java
+private Button button_notify;
+
+```
+
+- Create a method stub for the sendNotification() method:
+
+```java
+public void sendNotification() {}
+```
+- In the onCreate() method, initialize the Notify Me! button and create an onClickListener for it. Call sendNotification() from the onClick method:
+
+```java
+
+button_notify = findViewById(R.id.notify);
+button_notify.setOnClickListener(new View.OnClickListener() {
+   @Override
+   public void onClick(View view) {
+       sendNotification();
+   }
+});
+```
+#### Create a notification channel
+In the Settings app on an Android-powered device, users can adjust the notifications they receive. Starting with Android 8.0 (API level 26), your code can assign each of your app's notifications to a user-customizable notification channel:
+
+- Each notification channel represents a type of notification.
+- In your code, you can group several notifications in each notification channel.
+- For each notification channel, your app sets behavior for the channel, and the behavior is applied to all the notifications in the channel. For example, your app might set the notifications in a channel to play a sound, blink a light, or vibrate.
+- Whatever behavior your app sets for a notification channel, the user can change that behavior, and the user can turn off your app's notifications altogether.
+On Android-powered devices running Android 8.0 (API level 26) or higher, notification channels that you create in your app appear as Categories under App notifications in the device Settings app.
+
+For example, in the screenshot below of a device running Android 8.0, the Notify Me! app has one notification channel, Mascot Notification.
+
+<img style="width: 277.16px" src="https://codelabs.developers.google.com/codelabs/android-training-notifications/img/b4ad33b85806f6ae.png">
+
+
+When your app targets Android 8.0 (API level 26), to display notifications to your users you must implement at least one notification channel. To display notifications on lower-end devices, you're not required to implement notification channels. However, it's good practice to always do the following:
+
+- Target the latest available SDK.
+- Check the device's SDK version in your code. If the SDK version is 26 or higher, build notification channels.
+
+
+If your targetSdkVersion is set to 25 or lower, when your app runs on Android 8.0 (API level 26) or higher, it behaves the same as it would on devices running Android 7.1 (API level 25) or lower.
+
+Create a notification channel:
+
+1. In MainActivity, create a constant for the notification channel ID. Every notification channel must be associated with an ID that is unique within your package. You use this channel ID later, to post your notifications.
+
+```java
+
+private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
+
+```
+2. The Android system uses the NotificationManager class to deliver notifications to the user. In MainActivity.java, create a member variable to store the NotificationManager object.
+
+```java
+private NotificationManager mNotifyManager;
+```
+3. In MainActivity.java, create a createNotificationChannel() method and instantiate the NotificationManager inside the method.
+
+```java
+public void createNotificationChannel() 
+{
+     mNotifyManager = (NotificationManager)
+            getSystemService(NOTIFICATION_SERVICE);
+}
+
+```
+
+4. Create a notification channel in the createNotificationChannel() method. Because notification channels are only available in API 26 and higher, add a condition to check for the device's API version.
+
+```java
+public void createNotificationChannel() {
+mNotifyManager = (NotificationManager)
+       getSystemService(NOTIFICATION_SERVICE);
+     if (android.os.Build.VERSION.SDK_INT >=
+                                  android.os.Build.VERSION_CODES.O) {
+     // Create a NotificationChannel
+     }
+}
+```
+
+
+5. Inside the if statement, construct a NotificationChannel object and use PRIMARY_CHANNEL_ID as the channel id.
+6. Set the channel name. The name is displayed under notification Categories in the device's user-visible Settings app.
+7. Set the importance to IMPORTANCE_HIGH. (For the complete list of notification importance constants, see the NotificationManager documentation.)
+
+```java
+// Create a NotificationChannel
+NotificationChannel notificationChannel = new NotificationChannel(PRIMARY_CHANNEL_ID,
+       "Mascot Notification", NotificationManager
+       .IMPORTANCE_HIGH);
+```
+
+8. In createNotificationChannel(), inside the if statement, configure the notificationChannel object's initial settings. For example, you can set the notification light color, enable vibration, and set a description that's displayed in the device's Settings app. You can also configure a notification alert sound.
+
+```java
+notificationChannel.enableLights(true);
+notificationChannel.setLightColor(Color.RED);
+notificationChannel.enableVibration(true);
+notificationChannel.setDescription("Notification from Mascot");
+mNotifyManager.createNotificationChannel(notificationChannel);
+```
+
+
+
+
+
+
+
+
+
+
+
  
  
  
