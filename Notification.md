@@ -387,10 +387,56 @@ notificationChannel.enableVibration(true);
 notificationChannel.setDescription("Notification from Mascot");
 mNotifyManager.createNotificationChannel(notificationChannel);
 ```
+**Build your first notification**
+Notifications are created using the NotificationCompat.Builder class, which allows you to set the content and behavior of the notification. A notification can contain the following elements:
+
+- Icon (required), which you set in your code using the setSmallIcon() method.
+- Title (optional), which you set using setContentTitle().
+- Detail text (optional), which you set using setContentText().
 
 
+To create the required notification icon:
 
+1. In Android Studio, go to File > New > Image Asset.
+2. From the Icon Type drop-down list, select Notification Icons.
+3. Click the icon next to the Clip Art item to select a Material Design icon for your notification. For this app, use the Android icon.
+4. Rename the resource ic_android and click Next and Finish. This creates drawable files with different resolutions for different API levels.
 
+To build your notification and display it:
+
+1. You need to associate the notification with a notification ID so that your code can update or cancel the notification in the future. In MainActivity.java, create a constant for the notification ID:
+
+```java
+private static final int NOTIFICATION_ID = 0;
+```
+
+2. In MainActivity.java, at the end of the onCreate() method, call sendNotification().
+```java
+public void sendNotification(){}
+```
+3.Inside the sendNotification() method,create and instantiate the notification builder. For the notification channel ID, use PRIMARY_CHANNEL_ID. If a popup error is displayed, make sure that the NotificationCompat class is imported from the v4 Support Library.
+```java
+NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID);
+```
+4. Inside the sendNotification() method, add the title, text, and icon to the builder, as shown below.
+
+```java
+ notifyBuilder.setContentTitle("You've been notified!");
+ notifyBuilder.setContentText("This is your notification text.");
+ notifyBuilder.setSmallIcon(R.drawable.ic_android);
+
+```
+5. In MainActivity.java inside the oncreate method you should have to call the createNotificationChannel() method.
+```java
+button_notify = findViewById(R.id.notify);
+createNotificationChannel();
+
+```
+ 
+5. Call notify() on the NotificationManager:
+```java
+mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
+```
 
 
 
