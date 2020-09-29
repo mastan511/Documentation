@@ -433,11 +433,13 @@ createNotificationChannel();
 
 ```
  
-5. Call notify() on the NotificationManager:
+6. Call notify() on the NotificationManager:
 ```java
 mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
 ```
+**OutPut**
 
+![](https://raw.githubusercontent.com/mastan511/MastanImages/master/notification.gif)
 
 
 
