@@ -108,3 +108,7 @@ SharedPrefrence mPreferences = getPreference(MODE_PRIVATE);
     }
 
 ```
+
+**Output**
+
+![](https://raw.githubusercontent.com/mastan511/MastanImages/master/sharedprefrence.png)
