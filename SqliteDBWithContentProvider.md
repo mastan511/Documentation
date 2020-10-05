@@ -395,14 +395,97 @@ public class MyApplication extends ContentProvider {
 
 ```
 
+Now you can observe the AndroiManifest.xml file with in that <provider> tag was added.
+    
+    
+```xml
+    
+     <provider
+            android:authorities="com.example.sqlitedbexample.MYDATA"
+            android:name=".MyApplication"
+            android:enabled="true"
+            android:exported="true"
+            ></provider>
+    
+   
+```
 
 
 
 
 
+In the above code we have authorities by using that we can access the SqliteDbExample database to the Another Application.
+
+- Lets create a one new project called ContentResolverTest.
+
+**activity_main.xml**
+
+```xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Get Data"
+        android:onClick="getData"
+        />
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/data"
+    android:textSize="25sp"
+    />
 
 
+</LinearLayout>
+```
 
+**MainActivity.Java**
+```java
+package com.example.contentresolvertest;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    TextView tv;
+    Uri uri;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        tv = findViewById(R.id.data);
+        uri = Uri.parse("content://com.example.sqlitedbexample.MYDATA");
+    }
+
+    public void getData(View view) {
+       Cursor c = getContentResolver().query(uri,null,null,null,null);
+       StringBuilder builder = new StringBuilder();
+        while (c.moveToNext()){
+            builder.append(c.getInt(0)+" "+c.getString(1)+" "+c.getString(2)+"\n");
+        }
+        tv.setText(builder.toString());
+    }
+}
+
+```
+
+**OutPut**
+
+![](https://raw.githubusercontent.com/mastan511/MastanImages/master/contentprovider.png)
 
 
 
