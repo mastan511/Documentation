@@ -338,6 +338,63 @@ Here is the list of methods which you need to override in Content Provider class
 
 - getType() This method returns the MIME type of the data at the given URI.
 
+In SqliteDbExample Projcet just create a one ContentProvider classs with the name of **MyApplication.java**.
+After adding the contentprovider class just inialize the DbHelper class with in the oncreate method.
+After that just call the retriveMydata() method with in the query() method.
+
+```java
+
+package com.example.sqlitedbexample;
+
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+public class MyApplication extends ContentProvider {
+    DbHelper helper;
+    @Override
+    public boolean onCreate() {
+        helper = new DbHelper(getContext());
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
+        Cursor c = helper.retriveMydata();
+        return c;
+    }
+
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+        return null;
+    }
+
+    @Override
+    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
+        return 0;
+    }
+
+    @Override
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
+        return 0;
+    }
+}
+
+
+```
+
 
 
 
