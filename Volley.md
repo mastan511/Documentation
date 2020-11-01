@@ -26,7 +26,7 @@ Open build.gradle(Module: app) and add the following dependency:
 ```gradle
 dependencies{ 
     //...
-    implementation 'com.android.volley:volley:1.0.0'
+   implementation 'com.android.volley:volley:1.1.0'
 }
 ```
 In AndroidManifest.xml add the internet permission:
@@ -43,6 +43,13 @@ Classes in Volley Library:
 
 
 **Request:** All the necessary information for making web API call is stored in it. It is the base for creating network requests(GET, POST).
+
+#### Codelab For Volley Library:
+
+In this code lab we are going to create Covid19Tracker application By using the below api
+[https://api.covid19api.com/](https://api.covid19api.com/)
+
+
 
 
 
