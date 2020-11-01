@@ -264,6 +264,34 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.ViewInfo
 **OutPut**
 ![](https://raw.githubusercontent.com/mastan511/MastanImages/master/CountriesList.png)
 
+After displaying the countries List now we should have to display the each country covid status in the CountryDetailActivity for that we should have to send the country code to the CountryDetailActivity.java file . 
+
+In the CountryAdapter.java file write this code
+
+```java
+public class ViewInfo extends RecyclerView.ViewHolder {
+        TextView c_name;
+        public ViewInfo(@NonNull View itemView) {
+            super(itemView);
+            c_name = itemView.findViewById(R.id.country_name);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(ct,CountryDetailActivity.class);
+                    i.putExtra("countrycode",myList.get(getAdapterPosition()).getCountrycode());
+                    ct.startActivity(i);
+                }
+            });
+        }
+    }
+    
+```
+
+
+
+
+
+
 
 
 
