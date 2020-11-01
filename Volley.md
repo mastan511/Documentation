@@ -287,9 +287,342 @@ public class ViewInfo extends RecyclerView.ViewHolder {
     
 ```
 
+**activity_country_detail.xml**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CountryDetailActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="409dp"
+        android:layout_height="729dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginLeft="1dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="1dp"
+        android:layout_marginRight="1dp"
+        android:layout_marginBottom="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+```
+**CountryDetailActivity.java**
+
+```java
+package com.example.covid19tracker;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class CountryDetailActivity extends AppCompatActivity {
+    String countryCovidUrl = "https://api.covid19api.com/dayone/country/";
+    private RequestQueue mRequestQueue;
+    private Gson gson;
+    RecyclerView rv;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_country_detail);
+        String code = getIntent().getStringExtra("countrycode");
+        String mainUrl = countryCovidUrl+code;
+        Log.i("URL",mainUrl);
+        rv = findViewById(R.id.recycler);
+        mRequestQueue = Volley.newRequestQueue(this);
+        gson = new GsonBuilder().create();
+
+        StringRequest request = new StringRequest(Request.Method.GET, mainUrl, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Toast.makeText(CountryDetailActivity.this,
+                        "" + response, Toast.LENGTH_SHORT).show();
+                List<CountryCovidCases> list = Arrays.asList(gson.fromJson(response,CountryCovidCases[].class));
+                Collections.reverse(list);
+                Log.i("SIZE",""+list.size());
+                rv.setLayoutManager(new LinearLayoutManager(CountryDetailActivity.this));
+                rv.setAdapter(new CasesAdapter(list,CountryDetailActivity.this));
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        mRequestQueue.add(request);
 
 
 
+    }
+}
+
+```
+
+
+**CountryCovidCases.java**
+
+```java
+
+package com.example.covid19tracker;
+
+import com.google.gson.annotations.SerializedName;
+
+public class CountryCovidCases {
+    @SerializedName("Active")
+    private String activecases;
+
+    @SerializedName("Recovered")
+    private String recoveredcases;
+
+    @SerializedName("Deaths")
+    private String deaths;
+
+    @SerializedName("Date")
+    private String date;
+
+    public CountryCovidCases(String activecases, String recoveredcases, String deaths, String date) {
+        this.activecases = activecases;
+        this.recoveredcases = recoveredcases;
+        this.deaths = deaths;
+        this.date = date;
+    }
+
+    public String getActivecases() {
+        return activecases;
+    }
+
+    public void setActivecases(String activecases) {
+        this.activecases = activecases;
+    }
+
+    public String getRecoveredcases() {
+        return recoveredcases;
+    }
+
+    public void setRecoveredcases(String recoveredcases) {
+        this.recoveredcases = recoveredcases;
+    }
+
+    public String getDeaths() {
+        return deaths;
+    }
+
+    public void setDeaths(String deaths) {
+        this.deaths = deaths;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+}
+
+
+```
+**item.xml**
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:layout_margin="2dp"
+    android:background="#D0D87D">
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="TextView"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Active"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="92dp"
+        android:layout_marginLeft="92dp"
+        android:layout_marginTop="16dp"
+        android:text="Recovered"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:text="Deaths"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/date" />
+
+    <TextView
+        android:id="@+id/active"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="2dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/recover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="114dp"
+        android:layout_marginLeft="114dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="2dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/active"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/deaths"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="86dp"
+        android:layout_marginLeft="86dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="2dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/recover"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+**CasesAdapter.Java**
+
+```java
+package com.example.covid19tracker;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+public class CasesAdapter extends RecyclerView.Adapter<CasesAdapter.ViewInfo> {
+    Context ct;
+    List<CountryCovidCases> myList;
+    public CasesAdapter(List<CountryCovidCases> list, CountryDetailActivity countryDetailActivity) {
+        myList = list;
+        ct = countryDetailActivity;
+
+    }
+
+    @NonNull
+    @Override
+    public CasesAdapter.ViewInfo onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(ct).inflate(R.layout.item,parent,false);
+        return new ViewInfo(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull CasesAdapter.ViewInfo holder, int position) {
+        holder.date.setText(myList.get(position).getDate());
+        holder.active.setText(myList.get(position).getActivecases());
+        holder.recover.setText(myList.get(position).getRecoveredcases());
+        holder.deaths.setText(myList.get(position).getDeaths());
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return myList.size();
+    }
+
+    public class ViewInfo extends RecyclerView.ViewHolder {
+        TextView date,active,recover,deaths;
+        public ViewInfo(@NonNull View itemView) {
+            super(itemView);
+            date = itemView.findViewById(R.id.date);
+            active = itemView.findViewById(R.id.active);
+            recover = itemView.findViewById(R.id.recover);
+            deaths = itemView.findViewById(R.id.deaths);
+        }
+    }
+}
+
+
+```
+
+**OutPut**
+
+![](https://raw.githubusercontent.com/mastan511/MastanImages/master/caseslist.png)
 
 
 
