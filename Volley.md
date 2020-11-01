@@ -40,4 +40,17 @@ Classes in Volley Library:
 ### Volley has two main classes:
 
 **Request Queue:** It is the interest one uses for dispatching requests to the network. One can make a request queue on demand if required, but typically it is created early on, at startup time, and keep it around and use it as a Singleton.
+
+
 **Request:** All the necessary information for making web API call is stored in it. It is the base for creating network requests(GET, POST).
+
+
+
+
+
+
+
+
+
+
+
